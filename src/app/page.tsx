@@ -1,4 +1,7 @@
+"use client"
+
 import Image from "next/image"
+import { useState } from "react"
 
 const features = [
   {
@@ -19,10 +22,50 @@ const features = [
 ]
 
 export default function Page() {
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle")
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setStatus("sending")
+
+    const form = e.currentTarget
+    const formData = new FormData(form)
+
+    const payload = {
+      name: String(formData.get("name") || "").trim(),
+      email: String(formData.get("email") || "").trim(),
+      message: String(formData.get("message") || "").trim(),
+    }
+
+    if (!payload.name || !payload.email || !payload.message) {
+      setStatus("error")
+      return
+    }
+
+    try {
+      const res = await fetch("http://localhost:8002/contact", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(payload),
+      })
+
+      if (!res.ok) {
+        setStatus("error")
+        return
+      }
+
+      form.reset()
+      setStatus("sent")
+      window.setTimeout(() => setStatus("idle"), 2500)
+    } catch {
+      setStatus("error")
+    }
+  }
+
   return (
     <main className="min-h-screen bg-black text-white">
       {/* bg overlay */}
-      <div className="fixed inset-0 -z-10 opacity-20 pointer-events-none">
+      <div className="fixed inset-0 -z-10 opacity-20 pointer-events-none relative">
         <Image
           src="/images/abstract-background.png"
           alt="abstract background"
@@ -34,12 +77,7 @@ export default function Page() {
 
       <header className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Image
-            src="/images/logo-white.png"
-            alt="bluewire home"
-            width={36}
-            height={36}
-          />
+          <Image src="/images/logo-white.png" alt="bluewire home" width={36} height={36} />
           <span className="text-sm tracking-wide opacity-90">bluewire home</span>
         </div>
         <nav className="hidden md:flex items-center gap-6 text-sm opacity-85">
@@ -67,8 +105,8 @@ export default function Page() {
           </h1>
 
           <p className="mt-5 text-base leading-relaxed text-white/75 max-w-xl">
-            we help you measure exposure, prioritize fixes, and confirm results.
-            designed for bedrooms, offices, studios, and whole homes.
+            we help you measure exposure, prioritize fixes, and confirm results. designed for bedrooms, offices,
+            studios, and whole homes.
           </p>
 
           <div className="mt-7 flex flex-wrap gap-3">
@@ -93,6 +131,7 @@ export default function Page() {
             alt="bluewire home hero"
             width={1200}
             height={900}
+            sizes="(max-width: 768px) 100vw, 50vw"
             className="w-full h-full object-cover"
             priority
           />
@@ -110,15 +149,10 @@ export default function Page() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {features.map((feature) => (
-            <div
-              key={feature.title}
-              className="p-6 rounded-2xl border border-white/10 bg-white/5"
-            >
+            <div key={feature.title} className="p-6 rounded-2xl border border-white/10 bg-white/5">
               <Image src={feature.icon} alt={`${feature.title} icon`} width={44} height={44} />
               <h3 className="mt-4 text-lg font-medium">{feature.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-white/70">
-                {feature.desc}
-              </p>
+              <p className="mt-2 text-sm leading-relaxed text-white/70">{feature.desc}</p>
             </div>
           ))}
         </div>
@@ -131,15 +165,11 @@ export default function Page() {
           <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
               <p className="text-sm font-medium text-white/90">1) measure</p>
-              <p className="mt-2 text-sm text-white/70">
-                we identify key sources and document baseline readings.
-              </p>
+              <p className="mt-2 text-sm text-white/70">we identify key sources and document baseline readings.</p>
             </div>
             <div>
               <p className="text-sm font-medium text-white/90">2) reduce</p>
-              <p className="mt-2 text-sm text-white/70">
-                we prioritize the highest impact changes first.
-              </p>
+              <p className="mt-2 text-sm text-white/70">we prioritize the highest impact changes first.</p>
             </div>
             <div>
               <p className="text-sm font-medium text-white/90">3) validate</p>
@@ -157,31 +187,54 @@ export default function Page() {
           <div>
             <h2 className="text-2xl font-semibold tracking-tight">tell us about your space</h2>
             <p className="mt-2 text-sm text-white/70 max-w-lg">
-              bedroom, office, whole home, or studio. share your biggest concern and we'll suggest the best next step.
+              bedroom, office, whole home, or studio. share your biggest concern and we&apos;ll suggest the best
+              next step.
             </p>
           </div>
 
-          <form className="p-6 rounded-3xl border border-white/10 bg-white/5">
+          <form
+            onSubmit={handleSubmit}
+            className="p-6 rounded-3xl border border-white/10 bg-white/5"
+          >
             <div className="grid gap-3">
               <input
+                name="name"
+                aria-label="name"
                 className="w-full px-4 py-3 rounded-xl border border-white/10 bg-black/40 text-sm text-white placeholder:text-white/40 outline-none focus:border-white/25"
                 placeholder="name"
+                autoComplete="name"
+                required
               />
               <input
+                name="email"
+                aria-label="email"
                 className="w-full px-4 py-3 rounded-xl border border-white/10 bg-black/40 text-sm text-white placeholder:text-white/40 outline-none focus:border-white/25"
                 placeholder="email"
                 type="email"
+                autoComplete="email"
+                required
               />
               <textarea
+                name="message"
+                aria-label="message"
                 className="w-full px-4 py-3 min-h-[120px] rounded-xl border border-white/10 bg-black/40 text-sm text-white placeholder:text-white/40 outline-none focus:border-white/25"
                 placeholder="what are you trying to improve?"
+                required
               />
+
               <button
-                type="button"
-                className="mt-1 px-5 py-3 bg-white text-black rounded-xl text-sm font-medium hover:opacity-90"
+                type="submit"
+                disabled={status === "sending"}
+                className="mt-1 px-5 py-3 bg-white text-black rounded-xl text-sm font-medium hover:opacity-90 disabled:opacity-60"
               >
-                send
+                {status === "sending" ? "sending..." : status === "sent" ? "sent" : "send"}
               </button>
+
+              {status === "error" ? (
+                <p className="text-xs text-white/70">
+                  something went wrong. make sure the python api is running on localhost:8002.
+                </p>
+              ) : null}
             </div>
           </form>
         </div>
