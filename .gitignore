@@ -39,3 +39,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# next
+.next/
+out/
+node_modules/
+
+# python
+.venv/
+api/.venv/
+__pycache__/
+*.pyc
