@@ -1,36 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# bluewire audits
 
-## Getting Started
+emf audit logger (mvp). fastapi + postgres + a small server-rendered ui.
 
-First, run the development server:
+## why this exists
+quick way to capture emf audit readings during a walkthrough, then export a clean csv for a client or for your own records.
 
+## features (current)
+- create an audit (client, location, date)
+- add readings (room, device, distance, value, unit, notes)
+- view audits in the browser
+- export an audit to csv
+- postgres-backed storage (via sqlalchemy + alembic)
+
+## stack
+- python 3.12+
+- fastapi
+- postgres
+- sqlalchemy + alembic
+- htmx (minimal ui interactions)
+
+## quickstart (local)
+
+requirements: python 3.12+ and docker
+
+start postgres
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+docker compose up -d db
+```
+create env
+```bash
+cp .env.example .env
+```
+install deps
+```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+```
+run migrations
+```bash
+alembic upgrade head
+```
+start the server
+```bash
+python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+open
+	•	http://localhost:8000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+routes
+	•	GET / home (create audit + list recent)
+	•	POST /audits create audit
+	•	GET /audits/{audit_id} audit detail + readings table
+	•	POST /audits/{audit_id}/readings add reading (htmx partial update)
+	•	GET /audits/{audit_id}/export download csv
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+data model (mvp)
+	•	audits: client_name, location, audit_date
+	•	readings: audit_id, room, device, distance_cm, value, unit, notes
 
-## Learn More
+status
 
-To learn more about Next.js, take a look at the following resources:
+active development. current state:
+	•	app boots locally
+	•	migrations present
+	•	ui + csv export working
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+next:
+	•	redirect to audit detail after create
+	•	basic auth + roles
+	•	tags + attachments per audit
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**screenshots**
