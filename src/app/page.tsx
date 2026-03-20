@@ -42,8 +42,10 @@ export default function Page() {
       return
     }
 
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"
+
     try {
-      const res = await fetch("http://localhost:8002/contact", {
+      const res = await fetch(`${apiUrl}/contact`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(payload),
@@ -232,7 +234,7 @@ export default function Page() {
 
               {status === "error" ? (
                 <p className="text-xs text-white/70">
-                  something went wrong. make sure the python api is running on localhost:8002.
+                  something went wrong. make sure the python api is running on localhost:8000 (or set NEXT_PUBLIC_API_URL).
                 </p>
               ) : null}
             </div>

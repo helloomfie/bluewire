@@ -1,75 +1,72 @@
-# bluewire audits
+# bluewire home
 
-emf audit logger (mvp). fastapi + postgres + a small server-rendered ui.
+EMF consulting landing page. Next.js frontend + FastAPI backend.
 
-## why this exists
-quick way to capture emf audit readings during a walkthrough, then export a clean csv for a client or for your own records.
+## what it does
+
+marketing site for bluewire home — an EMF consulting service.
+visitors can read about the service, understand the process, and submit a contact request.
 
 ## features (current)
-- create an audit (client, location, date)
-- add readings (room, device, distance, value, unit, notes)
-- view audits in the browser
-- export an audit to csv
-- postgres-backed storage (via sqlalchemy + alembic)
+- landing page with hero, services, and process sections
+- contact form that posts to the FastAPI backend
+- FastAPI `/health` and `/contact` endpoints
+- CORS configured for local Next.js dev server
 
 ## stack
-- python 3.12+
-- fastapi
-- postgres
-- sqlalchemy + alembic
-- htmx (minimal ui interactions)
+- Next.js 16 + React 19 + TypeScript
+- Tailwind CSS v4
+- FastAPI (Python 3.12+)
+- Pydantic + email-validator
 
 ## quickstart (local)
 
-requirements: python 3.12+ and docker
+requirements: node 18+ and python 3.12+
 
-start postgres
+### frontend
+
 ```bash
-docker compose up -d db
+cp .env.example .env.local   # optional: set NEXT_PUBLIC_API_URL
+npm install
+npm run dev
 ```
-create env
+
+open http://localhost:3000
+
+### api
+
 ```bash
-cp .env.example .env
-```
-install deps
-```bash
+cd api
 python -m venv .venv
 source .venv/bin/activate
-python -m pip install -r requirements.txt
-```
-run migrations
-```bash
-alembic upgrade head
-```
-start the server
-```bash
-python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+pip install -r requirements.txt
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-open
-	•	http://localhost:8000
+api runs at http://localhost:8000
 
-routes
-	•	GET / home (create audit + list recent)
-	•	POST /audits create audit
-	•	GET /audits/{audit_id} audit detail + readings table
-	•	POST /audits/{audit_id}/readings add reading (htmx partial update)
-	•	GET /audits/{audit_id}/export download csv
+## routes
 
-data model (mvp)
-	•	audits: client_name, location, audit_date
-	•	readings: audit_id, room, device, distance_cm, value, unit, notes
+| method | path       | description               |
+|--------|------------|---------------------------|
+| GET    | /health    | health check              |
+| POST   | /contact   | submit contact form       |
 
-status
+## status
 
 active development. current state:
-	•	app boots locally
-	•	migrations present
-	•	ui + csv export working
+- landing page is functional (hero, services, process, contact form)
+- api boots and accepts contact form submissions (in-memory only — no db yet)
+- images in place
 
-next:
-	•	redirect to audit detail after create
-	•	basic auth + roles
-	•	tags + attachments per audit
+## next steps
+
+- [ ] persist contact submissions to postgres (sqlalchemy + alembic)
+- [ ] send email notification on contact form submit
+- [ ] add redirect or thank-you page after form submission
+- [ ] basic auth for an admin view of contact submissions
+- [ ] extract api url to env var (`NEXT_PUBLIC_API_URL`) so it's not hardcoded
+- [ ] docker compose for local dev (next + api + db)
+- [ ] deploy frontend (vercel) and api (railway / fly.io)
 
 **screenshots**
