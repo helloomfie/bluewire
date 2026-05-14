@@ -1,248 +1,214 @@
 "use client"
 
-import Image from "next/image"
 import { useState } from "react"
 
-const features = [
-  {
-    title: "audit",
-    desc: "find rf, electric fields, and magnetic field hotspots in the rooms that matter most.",
-    icon: "/images/icon-audit.png",
-  },
-  {
-    title: "plan",
-    desc: "get a prioritized roadmap so you know what to fix first and what to ignore.",
-    icon: "/images/icon-plan.png",
-  },
-  {
-    title: "protect",
-    desc: "apply targeted solutions and validate with before and after measurements.",
-    icon: "/images/icon-protect.png",
-  },
+const audits = [
+  { client: "my house", location: "pelham manor, new york", date: "jan 19, 2026", readings: 24 },
+  { client: "the office", location: "bayside, queens", date: "jan 18, 2026", readings: 18 },
+  { client: "art studio", location: "williamsburg, brooklyn", date: "jan 17, 2026", readings: 31 },
+]
+
+const readings = [
+  ["wifi router", "50 cm", "1.32", "mG"],
+  ["smart tv", "100 cm", "0.45", "mG"],
+  ["soundbar", "100 cm", "0.38", "mG"],
+  ["game console", "100 cm", "0.71", "mG"],
 ]
 
 export default function Page() {
-  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle")
-
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setStatus("sending")
-
-    const form = e.currentTarget
-    const formData = new FormData(form)
-
-    const payload = {
-      name: String(formData.get("name") || "").trim(),
-      email: String(formData.get("email") || "").trim(),
-      message: String(formData.get("message") || "").trim(),
-    }
-
-    if (!payload.name || !payload.email || !payload.message) {
-      setStatus("error")
-      return
-    }
-
-    try {
-      const res = await fetch("http://localhost:8002/contact", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(payload),
-      })
-
-      if (!res.ok) {
-        setStatus("error")
-        return
-      }
-
-      form.reset()
-      setStatus("sent")
-      window.setTimeout(() => setStatus("idle"), 2500)
-    } catch {
-      setStatus("error")
-    }
-  }
+  const [screen, setScreen] = useState<"home" | "detail" | "add">("home")
 
   return (
-    <main className="min-h-screen bg-black text-white">
-      {/* bg overlay */}
-      <div className="fixed inset-0 -z-10 opacity-20 pointer-events-none relative">
-        <Image
-          src="/images/abstract-background.png"
-          alt="abstract background"
-          fill
-          className="object-cover"
-          priority
-        />
-      </div>
+    <main className="min-h-screen bg-[#020712] text-white flex items-center justify-center p-4">
+      <div className="w-full max-w-[430px] min-h-[880px] rounded-[44px] border border-white/10 bg-[#07101d] shadow-2xl overflow-hidden relative">
 
-      <header className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Image src="/images/logo-white.png" alt="bluewire home" width={36} height={36} />
-          <span className="text-sm tracking-wide opacity-90">bluewire home</span>
-        </div>
-        <nav className="hidden md:flex items-center gap-6 text-sm opacity-85">
-          <a href="#services" className="hover:opacity-100">
-            services
-          </a>
-          <a href="#process" className="hover:opacity-100">
-            process
-          </a>
-          <a href="#contact" className="hover:opacity-100">
-            contact
-          </a>
-        </nav>
-      </header>
+        {/* phone glow */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(36,115,255,.25),transparent_35%)] pointer-events-none" />
 
-      {/* hero section */}
-      <section className="max-w-6xl mx-auto px-6 pt-10 pb-16 grid grid-cols-1 md:grid-cols-2 gap-10 md:items-center">
-        <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/15 bg-white/5 text-xs text-white/80">
-            emf • rf • dirty electricity
-          </div>
-
-          <h1 className="mt-5 text-4xl md:text-5xl font-semibold leading-tight tracking-tight">
-            emf protection for modern living, without the fear spiral.
-          </h1>
-
-          <p className="mt-5 text-base leading-relaxed text-white/75 max-w-xl">
-            we help you measure exposure, prioritize fixes, and confirm results. designed for bedrooms, offices,
-            studios, and whole homes.
-          </p>
-
-          <div className="mt-7 flex flex-wrap gap-3">
-            <a
-              href="#contact"
-              className="bg-white text-black px-5 py-3 rounded-xl text-sm font-medium hover:opacity-90"
-            >
-              book an audit
-            </a>
-            <a
-              href="#services"
-              className="border border-white/15 bg-white/5 text-white px-5 py-3 rounded-xl text-sm font-medium hover:bg-white/10"
-            >
-              view services
-            </a>
-          </div>
+        {/* top bar */}
+        <div className="relative z-10 flex justify-between items-center px-6 pt-6 pb-4 text-xs text-white/70">
+          <span>9:41</span>
+          <span>bluewire audits</span>
+          <span>▰▰▰</span>
         </div>
 
-        <div className="relative rounded-3xl border border-white/10 bg-white/5 overflow-hidden">
-          <Image
-            src="/images/main-hero.png"
-            alt="bluewire home hero"
-            width={1200}
-            height={900}
-            sizes="(max-width: 768px) 100vw, 50vw"
-            className="w-full h-full object-cover"
-            priority
-          />
-        </div>
-      </section>
-
-      {/* services */}
-      <section id="services" className="max-w-6xl mx-auto px-6 pb-16">
-        <div className="mb-6">
-          <h2 className="text-2xl font-semibold tracking-tight">start with clarity</h2>
-          <p className="mt-2 text-sm text-white/70 max-w-2xl">
-            three steps to a calmer, lower-emf space. simple, practical, and measurable.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {features.map((feature) => (
-            <div key={feature.title} className="p-6 rounded-2xl border border-white/10 bg-white/5">
-              <Image src={feature.icon} alt={`${feature.title} icon`} width={44} height={44} />
-              <h3 className="mt-4 text-lg font-medium">{feature.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-white/70">{feature.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* process */}
-      <section id="process" className="max-w-6xl mx-auto px-6 pb-16">
-        <div className="p-8 md:p-10 rounded-3xl border border-white/10 bg-white/5">
-          <h2 className="text-2xl font-semibold tracking-tight">how it works</h2>
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <p className="text-sm font-medium text-white/90">1) measure</p>
-              <p className="mt-2 text-sm text-white/70">we identify key sources and document baseline readings.</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-white/90">2) reduce</p>
-              <p className="mt-2 text-sm text-white/70">we prioritize the highest impact changes first.</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-white/90">3) validate</p>
-              <p className="mt-2 text-sm text-white/70">
-                we confirm improvements with before and after measurements.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* contact form */}
-      <section id="contact" className="max-w-6xl mx-auto px-6 pb-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div>
-            <h2 className="text-2xl font-semibold tracking-tight">tell us about your space</h2>
-            <p className="mt-2 text-sm text-white/70 max-w-lg">
-              bedroom, office, whole home, or studio. share your biggest concern and we&apos;ll suggest the best
-              next step.
-            </p>
-          </div>
-
-          <form
-            onSubmit={handleSubmit}
-            className="p-6 rounded-3xl border border-white/10 bg-white/5"
-          >
-            <div className="grid gap-3">
-              <input
-                name="name"
-                aria-label="name"
-                className="w-full px-4 py-3 rounded-xl border border-white/10 bg-black/40 text-sm text-white placeholder:text-white/40 outline-none focus:border-white/25"
-                placeholder="name"
-                autoComplete="name"
-                required
-              />
-              <input
-                name="email"
-                aria-label="email"
-                className="w-full px-4 py-3 rounded-xl border border-white/10 bg-black/40 text-sm text-white placeholder:text-white/40 outline-none focus:border-white/25"
-                placeholder="email"
-                type="email"
-                autoComplete="email"
-                required
-              />
-              <textarea
-                name="message"
-                aria-label="message"
-                className="w-full px-4 py-3 min-h-[120px] rounded-xl border border-white/10 bg-black/40 text-sm text-white placeholder:text-white/40 outline-none focus:border-white/25"
-                placeholder="what are you trying to improve?"
-                required
-              />
-
-              <button
-                type="submit"
-                disabled={status === "sending"}
-                className="mt-1 px-5 py-3 bg-white text-black rounded-xl text-sm font-medium hover:opacity-90 disabled:opacity-60"
-              >
-                {status === "sending" ? "sending..." : status === "sent" ? "sent" : "send"}
+        {screen === "home" && (
+          <section className="relative z-10 px-5 pb-24">
+            <div className="flex items-center justify-between mt-4">
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.35em] text-blue-400">emf audit logger</p>
+                <h1 className="mt-2 text-2xl font-mono tracking-tight">BLUEWIRE AUDITS</h1>
+              </div>
+              <button className="text-blue-400 border border-blue-500/40 rounded-xl px-3 py-2 text-xs">
+                CSV
               </button>
-
-              {status === "error" ? (
-                <p className="text-xs text-white/70">
-                  something went wrong. make sure the python api is running on localhost:8002.
-                </p>
-              ) : null}
             </div>
-          </form>
-        </div>
 
-        <footer className="mt-14 pt-8 border-t border-white/10 text-xs text-white/50">
-          © {new Date().getFullYear()} bluewire home
-        </footer>
-      </section>
+            <button
+              onClick={() => setScreen("add")}
+              className="mt-8 w-full rounded-2xl border border-blue-500/30 bg-blue-500/10 p-5 flex items-center gap-4 text-left"
+            >
+              <div className="h-14 w-14 rounded-xl border border-dashed border-blue-400 flex items-center justify-center text-3xl text-blue-400">
+                +
+              </div>
+              <div>
+                <p className="text-blue-300 font-mono">new audit</p>
+                <p className="text-xs text-white/50 mt-1">create a new emf walkthrough</p>
+              </div>
+            </button>
+
+            <div className="grid grid-cols-3 gap-3 mt-7">
+              <Stat value="24" label="readings" />
+              <Stat value="1.28" label="avg mG" />
+              <Stat value="3" label="flagged" />
+            </div>
+
+            <div className="mt-8 flex items-center justify-between">
+              <h2 className="text-sm uppercase tracking-widest text-white/70">recent audits</h2>
+              <button className="text-xs text-blue-400">view all</button>
+            </div>
+
+            <div className="mt-4 space-y-3">
+              {audits.map((audit) => (
+                <button
+                  key={audit.client}
+                  onClick={() => setScreen("detail")}
+                  className="w-full rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-left flex justify-between items-center"
+                >
+                  <div>
+                    <p className="font-mono text-sm">{audit.client}</p>
+                    <p className="text-xs text-white/45 mt-1">{audit.location}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-white/50">{audit.date}</p>
+                    <p className="text-xs text-blue-400 mt-1">{audit.readings} readings</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {screen === "detail" && (
+          <section className="relative z-10 px-5 pb-24">
+            <button onClick={() => setScreen("home")} className="text-white/60 mt-4">← back</button>
+
+            <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.04] p-5">
+              <h1 className="text-xl text-blue-400 font-mono">anderson residence</h1>
+              <p className="text-sm text-white/55 mt-3">austin, tx</p>
+              <p className="text-sm text-white/55 mt-1">may 19, 2026</p>
+              <p className="text-sm text-white/45 mt-3">initial walkthrough assessment</p>
+            </div>
+
+            <div className="mt-7 flex justify-between items-center">
+              <h2 className="text-sm uppercase tracking-widest text-white/70">rooms & readings</h2>
+              <span className="text-xs text-blue-400 border border-blue-500/30 rounded-full px-3 py-1">
+                24 readings
+              </span>
+            </div>
+
+            <div className="mt-4 rounded-2xl border border-white/10 overflow-hidden">
+              <div className="bg-white/[0.06] px-4 py-3 flex justify-between">
+                <span className="font-mono text-sm">living room</span>
+                <span className="text-xs text-white/50">5</span>
+              </div>
+
+              <table className="w-full text-xs">
+                <thead className="bg-white/[0.04] text-white/45 uppercase">
+                  <tr>
+                    <th className="text-left p-3">device</th>
+                    <th className="text-left p-3">distance</th>
+                    <th className="text-left p-3">value</th>
+                    <th className="text-left p-3">unit</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {readings.map((r) => (
+                    <tr key={r[0]} className="border-t border-white/10">
+                      <td className="p-3">{r[0]}</td>
+                      <td className="p-3 text-white/60">{r[1]}</td>
+                      <td className="p-3 text-blue-300">{r[2]}</td>
+                      <td className="p-3 text-white/60">{r[3]}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <button
+              onClick={() => setScreen("add")}
+              className="absolute bottom-8 right-6 h-16 w-16 rounded-full bg-blue-600 text-4xl shadow-xl shadow-blue-600/30"
+            >
+              +
+            </button>
+          </section>
+        )}
+
+        {screen === "add" && (
+          <section className="relative z-10 px-5 pb-24">
+            <button onClick={() => setScreen("detail")} className="text-white/60 mt-4">← back</button>
+
+            <h1 className="mt-6 text-center text-sm uppercase tracking-[0.3em]">add reading</h1>
+
+            <form className="mt-8 rounded-2xl border border-white/10 bg-white/[0.04] p-5 space-y-5">
+              <Field label="room" placeholder="living room" />
+              <Field label="device" placeholder="wifi router" />
+              <Field label="distance cm" placeholder="50 cm" />
+              <Field label="value" placeholder="1.32" />
+
+              <label className="block">
+                <span className="text-xs uppercase tracking-widest text-white/45">unit</span>
+                <select className="mt-2 w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm outline-none">
+                  <option>mG</option>
+                  <option>V/m</option>
+                  <option>µW/m²</option>
+                </select>
+              </label>
+
+              <label className="block">
+                <span className="text-xs uppercase tracking-widest text-white/45">notes</span>
+                <textarea
+                  placeholder="enter notes..."
+                  className="mt-2 min-h-[120px] w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm outline-none placeholder:text-white/30"
+                />
+              </label>
+
+              <button className="w-full rounded-xl bg-blue-600 py-4 text-sm font-mono tracking-widest">
+                ✓ save reading
+              </button>
+            </form>
+          </section>
+        )}
+
+        {/* bottom nav */}
+        <nav className="absolute bottom-0 left-0 right-0 z-20 border-t border-white/10 bg-[#07101d]/90 backdrop-blur px-6 py-4 flex justify-between text-[11px] text-white/45">
+          <button onClick={() => setScreen("home")} className={screen === "home" ? "text-blue-400" : ""}>home</button>
+          <button onClick={() => setScreen("detail")} className={screen === "detail" ? "text-blue-400" : ""}>audits</button>
+          <button>exports</button>
+          <button>settings</button>
+        </nav>
+      </div>
     </main>
+  )
+}
+
+function Stat({ value, label }: { value: string; label: string }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-center">
+      <p className="text-2xl font-mono">{value}</p>
+      <p className="mt-1 text-[10px] uppercase tracking-widest text-white/45">{label}</p>
+    </div>
+  )
+}
+
+function Field({ label, placeholder }: { label: string; placeholder: string }) {
+  return (
+    <label className="block">
+      <span className="text-xs uppercase tracking-widest text-white/45">{label}</span>
+      <input
+        placeholder={placeholder}
+        className="mt-2 w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm outline-none placeholder:text-white/30"
+      />
+    </label>
   )
 }
