@@ -15,6 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Bluewire Audits",
   description: "EMF audit logger for walkthrough readings and CSV exports.",
+  themeColor: "#020712",
 }
 
 export default function RootLayout({
